@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประมาณการราคาโครงการระบบกล้องวงจรปิดแบบรวมศูนย์</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+        
+        .card .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .card.total {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .card.special {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .number {
+            text-align: right;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .subtotal-row {
+            background: #ecf0f1;
+            font-weight: 700;
+        }
+        
+        .total-row {
+            background: #3498db;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .timeline-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .timeline-item .phase {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-item .percentage {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-item .amount {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .notes {
+            background: #ffefc1;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        
+        .notes h3 {
+            color: #d68910;
+            margin-bottom: 10px;
+        }
+        
+        .notes ul {
+            margin-left: 20px;
+            color: #7f8c8d;
+        }
+        
+        .notes li {
+            margin-bottom: 5px;
+        }
+        
+        .footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .card {
+                break-inside: avoid;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ประมาณการราคาโครงการ</h1>
+            <p>พัฒนาระบบกล้องวงจรปิดแบบรวมศูนย์เพื่อวิเคราะห์และประเมินความเสี่ยงบริเวณท่าเทียบเรือ</p>
+            <p style="margin-top: 10px;">กรมเจ้าท่า | จำนวน 59 ท่าเทียบเรือ | ระยะเวลา 12 เดือน</p>
+        </div>
+        
+        <div class="content">
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>งบประมาณโครงการ</h3>
+                    <div class="value">59,000,000 บาท</div>
+                </div>
+                <div class="card special">
+                    <h3>จำนวนท่าเทียบเรือ</h3>
+                    <div class="value">59 แห่ง</div>
+                </div>
+                <div class="card">
+                    <h3>ระยะเวลาดำเนินการ</h3>
+                    <div class="value">12 เดือน</div>
+                </div>
+                <div class="card total">
+                    <h3>ราคาเฉลี่ยต่อท่า</h3>
+                    <div class="value">1,000,000 บาท</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📊 สรุปงบประมาณตามหมวดหมู่</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">ลำดับ</th>
+                                <th style="width: 45%">หมวดหมู่</th>
+                                <th style="width: 25%">จำนวนเงิน (บาท)</th>
+                                <th style="width: 25%">ร้อยละ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>ระบบซอฟต์แวร์และ AI Platform</td>
+                                <td class="number">17,500,000</td>
+                                <td class="number">29.66%</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>อุปกรณ์ Hardware และ Infrastructure</td>
+                                <td class="number">12,800,000</td>
+                                <td class="number">21.69%</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>ระบบเครือข่ายและการเชื่อมต่อ</td>
+                                <td class="number">8,500,000</td>
+                                <td class="number">14.41%</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>ค่าติดตั้งและ System Integration</td>
+                                <td class="number">5,600,000</td>
+                                <td class="number">9.49%</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>ค่าบริหารจัดการโครงการ</td>
+                                <td class="number">4,200,000</td>
+                                <td class="number">7.12%</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>ค่าฝึกอบรมและถ่ายทอดเทคโนโลยี</td>
+                                <td class="number">3,200,000</td>
+                                <td class="number">5.42%</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>ค่า Maintenance & Support (ปีที่ 1)</td>
+                                <td class="number">2,800,000</td>
+                                <td class="number">4.75%</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>ค่า Quality Assurance และการรับประกัน</td>
+                                <td class="number">2,400,000</td>
+                                <td class="number">4.07%</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>ค่าใช้จ่ายสำรองและบริหารความเสี่ยง</td>
+                                <td class="number">2,000,000</td>
+                                <td class="number">3.39%</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="2">รวมทั้งสิ้น</td>
+                                <td class="number">59,000,000</td>
+                                <td class="number">100.00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">💻 1. ระบบซอฟต์แวร์และ AI Platform (17,500,000 บาท)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>รายการ</th>
+                                <th>รายละเอียด/สเปค</th>
+                                <th>จำนวน</th>
+                                <th>ราคาต่อหน่วย</th>
+                                <th>รวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>AI Video Analytics Platform</td>
+                                <td>Enterprise License with Deep Learning Capabilities</td>
+                                <td>1 ชุด</td>
+                                <td class="number">7,200,000</td>
+                                <td class="number">7,200,000</td>
+                            </tr>
+                            <tr>
+                                <td>VMS Software</td>
+                                <td>Milestone XProtect Corporate หรือเทียบเท่า</td>
+                                <td>1 License</td>
+                                <td class="number">3,200,000</td>
+                                <td class="number">3,200,000</td>
+                            </tr>
+                            <tr>
+                                <td>AI Model Development</td>
+                                <td>Custom Models สำหรับ 5 Use Cases</td>
+                                <td>5 Models</td>
+                                <td class="number">800,000</td>
+                                <td class="number">4,000,000</td>
+                            </tr>
+                            <tr>
+                                <td>Dashboard & Analytics</td>
+                                <td>Real-time Monitoring & Reporting System</td>
+                                <td>1 ระบบ</td>
+                                <td class="number">2,100,000</td>
+                                <td class="number">2,100,000</td>
+                            </tr>
+                            <tr>
+                                <td>API & Integration Module</td>
+                                <td>RESTful API และ System Integration</td>
+                                <td>1 ชุด</td>
+                                <td class="number">1,000,000</td>
+                                <td class="number">1,000,000</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="4">รวม</td>
+                                <td class="number">17,500,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🖥️ 2. อุปกรณ์ Hardware และ Infrastructure (12,800,000 บาท)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>รายการ</th>
+                                <th>รายละเอียด/สเปค</th>
+                                <th>จำนวน</th>
+                                <th>ราคาต่อหน่วย</th>
+                                <th>รวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GPU Server</td>
+                                <td>NVIDIA DGX A100 หรือเทียบเท่า</td>
+                                <td>2 เครื่อง</td>
+                                <td class="number">3,200,000</td>
+                                <td class="number">6,400,000</td>
+                            </tr>
+                            <tr>
+                                <td>Storage System</td>
+                                <td>400TB Enterprise Storage, RAID 6</td>
+                                <td>2 ชุด</td>
+                                <td class="number">1,400,000</td>
+                                <td class="number">2,800,000</td>
+                            </tr>
+                            <tr>
+                                <td>Network Video Recorder</td>
+                                <td>64 Channel, 30 Days Recording</td>
+                                <td>12 เครื่อง</td>
+                                <td class="number">150,000</td>
+                                <td class="number">1,800,000</td>
+                            </tr>
+                            <tr>
+                                <td>Monitoring Workstation</td>
+                                <td>High-Performance Workstation</td>
+                                <td>5 เครื่อง</td>
+                                <td class="number">100,000</td>
+                                <td class="number">500,000</td>
+                            </tr>
+                            <tr>
+                                <td>Video Wall System</td>
+                                <td>4x55" Display with Controller</td>
+                                <td>1 ชุด</td>
+                                <td class="number">800,000</td>
+                                <td class="number">800,000</td>
+                            </tr>
+                            <tr>
+                                <td>UPS System</td>
+                                <td>30KVA Online UPS</td>
+                                <td>2 ชุด</td>
+                                <td class="number">250,000</td>
+                                <td class="number">500,000</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="4">รวม</td>
+                                <td class="number">12,800,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🌐 3. ระบบเครือข่ายและการเชื่อมต่อ (8,500,000 บาท)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>รายการ</th>
+                                <th>รายละเอียด/สเปค</th>
+                                <th>จำนวน</th>
+                                <th>ราคาต่อหน่วย</th>
+                                <th>รวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Core Network Switch</td>
+                                <td>10Gbps Layer 3 Managed Switch</td>
+                                <td>2 เครื่อง</td>
+                                <td class="number">750,000</td>
+                                <td class="number">1,500,000</td>
+                            </tr>
+                            <tr>
+                                <td>Edge Switch</td>
+                                <td>PoE+ 48 Ports Managed Switch</td>
+                                <td>30 เครื่อง</td>
+                                <td class="number">70,000</td>
+                                <td class="number">2,100,000</td>
+                            </tr>
+                            <tr>
+                                <td>Enterprise Firewall</td>
+                                <td>Next-Gen Firewall with IPS/IDS</td>
+                                <td>2 เครื่อง</td>
+                                <td class="number">550,000</td>
+                                <td class="number">1,100,000</td>
+                            </tr>
+                            <tr>
+                                <td>Video Encoder</td>
+                                <td>16 Channel H.265 Encoder</td>
+                                <td>90 ตัว</td>
+                                <td class="number">20,000</td>
+                                <td class="number">1,800,000</td>
+                            </tr>
+                            <tr>
+                                <td>Network Infrastructure</td>
+                                <td>Fiber Optic และ Network Cabling</td>
+                                <td>59 จุด</td>
+                                <td class="number">28,000</td>
+                                <td class="number">1,652,000</td>
+                            </tr>
+                            <tr>
+                                <td>4G/5G Backup Router</td>
+                                <td>Industrial Grade Cellular Router</td>
+                                <td>10 ตัว</td>
+                                <td class="number">34,800</td>
+                                <td class="number">348,000</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="4">รวม</td>
+                                <td class="number">8,500,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">⚙️ 4. ค่าติดตั้งและ System Integration (5,600,000 บาท)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>รายการ</th>
+                                <th>รายละเอียด</th>
+                                <th>จำนวน</th>
+                                <th>ราคาต่อหน่วย</th>
+                                <th>รวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Site Survey & Assessment</td>
+                                <td>สำรวจและประเมินสถานที่ทั้ง 59 แห่ง</td>
+                                <td>59 แห่ง</td>
+                                <td class="number">18,000</td>
+                                <td class="number">1,062,000</td>
+                            </tr>
+                            <tr>
+                                <td>System Integration</td>
+                                <td>เชื่อมต่อระบบกล้องเข้ากับระบบกลาง</td>
+                                <td>59 แห่ง</td>
+                                <td class="number">38,000</td>
+                                <td class="number">2,242,000</td>
+                            </tr>
+                            <tr>
+                                <td>Configuration & Setup</td>
+                                <td>ตั้งค่าระบบ AI และ VMS</td>
+                                <td>59 แห่ง</td>
+                                <td class="number">22,000</td>
+                                <td class="number">1,298,000</td>
+                            </tr>
+                            <tr>
+                                <td>Testing & Commissioning</td>
+                                <td>ทดสอบและส่งมอบระบบ</td>
+                                <td>59 แห่ง</td>
+                                <td class="number">14,000</td>
+                                <td class="number">826,000</td>
+                            </tr>
+                            <tr>
+                                <td>Documentation</td>
+                                <td>จัดทำเอกสารทางเทคนิคและคู่มือ</td>
+                                <td>1 ชุด</td>
+                                <td class="number">172,000</td>
+                                <td class="number">172,000</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="4">รวม</td>
+                                <td class="number">5,600,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📈 การแบ่งงวดงานและการชำระเงิน</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="phase">งวดที่ 1</div>
+                        <div class="percentage">20%</div>
+                        <div class="amount">11,800,000 บาท</div>
+                        <div style="margin-top: 10px; font-size: 14px;">ลงนามสัญญา<br>ส่งแผนงาน</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="phase">งวดที่ 2</div>
+                        <div class="percentage">25%</div>
+                        <div class="amount">14,750,000 บาท</div>
+                        <div style="margin-top: 10px; font-size: 14px;">ติดตั้ง Hardware<br>50%</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="phase">งวดที่ 3</div>
+                        <div class="percentage">20%</div>
+                        <div class="amount">11,800,000 บาท</div>
+                        <div style="margin-top: 10px; font-size: 14px;">ติดตั้ง Software<br>Integration</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="phase">งวดที่ 4</div>
+                        <div class="percentage">20%</div>
+                        <div class="amount">11,800,000 บาท</div>
+                        <div style="margin-top: 10px; font-size: 14px;">ทดสอบระบบ<br>ฝึกอบรม</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="phase">งวดที่ 5</div>
+                        <div class="percentage">15%</div>
+                        <div class="amount">8,850,000 บาท</div>
+                        <div style="margin-top: 10px; font-size: 14px;">ส่งมอบงาน<br>สมบูรณ์</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📚 แผนการฝึกอบรม (3,200,000 บาท)</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>หลักสูตร</th>
+                                <th>กลุ่มเป้าหมาย</th>
+                                <th>จำนวนรุ่น</th>
+                                <th>ผู้เข้าอบรม</th>
+                                <th>งบประมาณ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>System Administrator</td>
+                                <td>ผู้ดูแลระบบหลัก</td>
+                                <td>3 รุ่น</td>
+                                <td>60 คน</td>
+                                <td class="number">1,200,000</td>
+                            </tr>
+                            <tr>
+                                <td>Operator Training</td>
+                                <td>ผู้ปฏิบัติงานประจำท่า</td>
+                                <td>6 รุ่น</td>
+                                <td>180 คน</td>
+                                <td class="number">1,400,000</td>
+                            </tr>
+                            <tr>
+                                <td>Executive Workshop</td>
+                                <td>ผู้บริหาร</td>
+                                <td>2 รุ่น</td>
+                                <td>40 คน</td>
+                                <td class="number">300,000</td>
+                            </tr>
+                            <tr>
+                                <td>Training Materials</td>
+                                <td>คู่มือและสื่อการเรียนรู้</td>
+                                <td>1 ชุด</td>
+                                <td>-</td>
+                                <td class="number">300,000</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="4">รวม</td>
+                                <td class="number">3,200,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🎯 คุณสมบัติหลักของระบบ AI ที่จะได้รับ</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="padding: 15px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <strong>🔍 Intrusion Detection</strong><br>
+                        <span style="font-size: 14px; color: #666;">ตรวจจับการบุกรุกพื้นที่หวงห้าม</span>
+                    </div>
+                    <div style="padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 5px;">
+                        <strong>📦 Object Detection</strong><br>
+                        <span style="font-size: 14px; color: #666;">ตรวจจับวัตถุต้องสงสัย/ถูกทิ้งไว้</span>
+                    </div>
+                    <div style="padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 5px;">
+                        <strong>👤 Facial Recognition</strong><br>
+                        <span style="font-size: 14px; color: #666;">จดจำใบหน้าบุคคลในบัญชีดำ</span>
+                    </div>
+                    <div style="padding: 15px; background: #f3e5f5; border-left: 4px solid #9c27b0; border-radius: 5px;">
+                        <strong>🚛 Vehicle Counting</strong><br>
+                        <span style="font-size: 14px; color: #666;">นับจำนวนยานพาหนะเข้า-ออก</span>
+                    </div>
+                    <div style="padding: 15px; background: #fce4ec; border-left: 4px solid #e91e63; border-radius: 5px;">
+                        <strong>📋 Container OCR</strong><br>
+                        <span style="font-size: 14px; color: #666;">อ่านหมายเลขตู้คอนเทนเนอร์</span>
+                    </div>
+                    <div style="padding: 15px; background: #e0f2f1; border-left: 4px solid #009688; border-radius: 5px;">
+                        <strong>📊 Real-time Analytics</strong><br>
+                        <span style="font-size: 14px; color: #666;">วิเคราะห์ข้อมูลแบบ Real-time</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🏆 ผลประโยชน์ที่จะได้รับ</h2>
+                <div style="background: #f0f9ff; border-radius: 10px; padding: 20px; margin-top: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div>
+                            <h4 style="color: #0369a1; margin-bottom: 10px;">✅ ด้านความปลอดภัย</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 5px 0;">• ยกระดับความปลอดภัยตามมาตรฐาน ISPS Code</li>
+                                <li style="padding: 5px 0;">• ตรวจจับภัยคุกคามได้ตั้งแต่เริ่มต้น</li>
+                                <li style="padding: 5px 0;">• ลดความเสี่ยงจากอุบัติเหตุและการบุกรุก</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #0369a1; margin-bottom: 10px;">✅ ด้านประสิทธิภาพ</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 5px 0;">• ลดเวลาตอบสนองต่อเหตุการณ์ 70%</li>
+                                <li style="padding: 5px 0;">• ประหยัดค่าใช้จ่ายด้านบุคลากร 40%</li>
+                                <li style="padding: 5px 0;">• เพิ่มประสิทธิภาพการทำงานของท่าเรือ</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #0369a1; margin-bottom: 10px;">✅ ด้านการบริหาร</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 5px 0;">• ข้อมูลเชิงลึกสำหรับการตัดสินใจ</li>
+                                <li style="padding: 5px 0;">• รายงานแบบ Real-time Dashboard</li>
+                                <li style="padding: 5px 0;">• ระบบบริหารจัดการแบบรวมศูนย์</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #0369a1; margin-bottom: 10px;">✅ ด้านภาพลักษณ์</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 5px 0;">• สร้างความเชื่อมั่นให้ผู้ใช้บริการ</li>
+                                <li style="padding: 5px 0;">• ยกระดับมาตรฐานสู่ระดับสากล</li>
+                                <li style="padding: 5px 0;">• เป็นต้นแบบท่าเรืออัจฉริยะ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📅 แผนการดำเนินงาน 12 เดือน</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">กิจกรรม</th>
+                                <th>เดือน 1-2</th>
+                                <th>เดือน 3-4</th>
+                                <th>เดือน 5-6</th>
+                                <th>เดือน 7-8</th>
+                                <th>เดือน 9-10</th>
+                                <th>เดือน 11-12</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Site Survey ทั้ง 59 ท่า</td>
+                                <td style="background: #4caf50; color: white; text-align: center;">✓</td>
+                                <td style="background: #4caf50; color: white; text-align: center;">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>จัดหาและติดตั้ง Hardware</td>
+                                <td></td>
+                                <td style="background: #2196f3; color: white; text-align: center;">✓</td>
+                                <td style="background: #2196f3; color: white; text-align: center;">✓</td>
+                                <td style="background: #2196f3; color: white; text-align: center;">✓</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>พัฒนาและติดตั้ง Software</td>
+                                <td></td>
+                                <td></td>
+                                <td style="background: #ff9800; color: white; text-align: center;">✓</td>
+                                <td style="background: #ff9800; color: white; text-align: center;">✓</td>
+                                <td style="background: #ff9800; color: white; text-align: center;">✓</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>System Integration</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="background: #9c27b0; color: white; text-align: center;">✓</td>
+                                <td style="background: #9c27b0; color: white; text-align: center;">✓</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>ทดสอบระบบ</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="background: #e91e63; color: white; text-align: center;">✓</td>
+                                <td style="background: #e91e63; color: white; text-align: center;">✓</td>
+                            </tr>
+                            <tr>
+                                <td>ฝึกอบรมและส่งมอบ</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="background: #009688; color: white; text-align: center;">✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🛠️ บริการหลังการขาย (Included)</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="text-align: center; padding: 20px; background: #fff; border: 2px solid #3498db; border-radius: 10px;">
+                        <div style="font-size: 30px; color: #3498db;">🔧</div>
+                        <strong>Preventive Maintenance</strong><br>
+                        <span style="font-size: 14px;">ตรวจเช็คระบบทุก 3 เดือน</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #fff; border: 2px solid #e74c3c; border-radius: 10px;">
+                        <div style="font-size: 30px; color: #e74c3c;">📞</div>
+                        <strong>24/7 Support</strong><br>
+                        <span style="font-size: 14px;">ศูนย์บริการตลอด 24 ชม.</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #fff; border: 2px solid #2ecc71; border-radius: 10px;">
+                        <div style="font-size: 30px; color: #2ecc71;">🔄</div>
+                        <strong>Software Update</strong><br>
+                        <span style="font-size: 14px;">อัพเดทระบบฟรี 1 ปี</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #fff; border: 2px solid #f39c12; border-radius: 10px;">
+                        <div style="font-size: 30px; color: #f39c12;">👨‍🏫</div>
+                        <strong>Training Support</strong><br>
+                        <span style="font-size: 14px;">อบรมเพิ่มเติมเมื่อต้องการ</span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #fff; border: 2px solid #9b59b6; border-radius: 10px;">
+                        <div style="font-size: 30px; color: #9b59b6;">📊</div>
+                        <strong>Performance Report</strong><br>
+                        <span style="font-size: 14px;">รายงานประสิทธิภาพรายเดือน</span>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div class="footer">
+            <p><strong>บริษัทผู้เสนอราคา:</strong> [ระบุชื่อบริษัท] | <strong>ติดต่อ:</strong> [เบอร์โทร] | [อีเมล]</p>
+            <p style="margin-top: 10px;">เอกสารนี้จัดทำขึ้นเพื่อประกอบการพิจารณาโครงการ | วันที่เสนอราคา: [วันที่]</p>
+        </div>
+    </div>
+</body>
+</html>
